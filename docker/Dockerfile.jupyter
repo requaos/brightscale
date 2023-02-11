@@ -1,0 +1,40 @@
+FROM jupyter/base-notebook
+
+USER root
+
+RUN apt-get -y update && \
+    apt-get install --no-install-recommends -y \
+      curl \
+      openjdk-11-jre-headless \
+      ca-certificates-java && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Fix the value of PYTHONHASHSEED
+# Note: this is needed when you use Python 3.3 or greater
+ENV SPARK_VERSION=3.3.1 \
+HADOOP_VERSION=3 \
+SPARK_HOME=/opt/spark \
+PYTHONHASHSEED=1 \
+SCALA_VERSION=2.13 \
+DELTA_VERSION=2.2.0
+
+# Download and uncompress spark from the apache archive
+RUN wget --no-verbose -O apache-spark.tgz "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}-scala${SCALA_VERSION}.tgz" \
+&& mkdir -p /opt/spark \
+&& tar -xf apache-spark.tgz -C /opt/spark --strip-components=1 \
+&& rm apache-spark.tgz
+
+# DeltaLake
+RUN wget https://repo1.maven.org/maven2/io/delta/delta-core_$SCALA_VERSION/$DELTA_VERSION/delta-core_$SCALA_VERSION-$DELTA_VERSION.jar -P $SPARK_HOME/jars/ && \
+    wget https://repo1.maven.org/maven2/io/delta/delta-storage/$DELTA_VERSION/delta-storage-$DELTA_VERSION.jar -P $SPARK_HOME/jars/
+
+# Install Toree kernel for Scala2.13 support on spark 3.x
+RUN pip install https://dist.apache.org/repos/dist/dev/incubator/toree/0.5.0-incubating-rc5/toree-pip/toree-0.5.0.tar.gz && \
+    jupyter toree install --spark_home=${SPARK_HOME} && \
+    chown -R $NB_UID /home/jovyan/.local
+
+RUN fix-permissions /usr/local/share/jupyter/
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER $NB_UID

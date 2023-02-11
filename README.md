@@ -2,21 +2,24 @@
 
 ### A DeltaLake demo using Scala v2.13 on Spark v3.3.1, Scala v2.13 on Deltalake Standalone and a suite of maintenance utilities written in Rust using Delta-rs
 
-#### cli stash:
+#### Demo setup:
 
 On NixOS, get a completely ephemeral development environment:
+This leverages the work from [typelevel](https://github.com/typelevel/typelevel-nix)
 
 ```shell
 nix develop github:typelevel/typelevel-nix#application
 ```
 
 Build scala demo:
+This is the scala [streaming example from delta-io](https://github.com/delta-io/delta/blob/master/examples/scala/src/main/scala/example/Streaming.scala)
 
 ```shell
 sbt -Dsbt.ivy.home=./dist/ publishLocal
 ```
 
 Launch demo:
+Initial spark configuration using docker and docker-compose adapted from: [Creating a Spark Standalone Cluster with Docker and docker-compose(2021 update)](https://dev.to/mvillarrealb/creating-a-spark-standalone-cluster-with-docker-and-docker-compose-2021-update-6l4)
 
 ```shell
 docker-compose up --build

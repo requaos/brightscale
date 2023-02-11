@@ -4,30 +4,24 @@ services:
   spark-master:
     build:
       context: .
+      dockerfile: ./docker/Dockerfile.delta-spark_scala2.13
     ports:
       - "9090:8080"
       - "7077:7077"
     volumes:
+      - ./conf/master:/conf
       - ./dist:/opt/spark-apps
+      - ./dist:/opt/spark/work
       - ./data:/opt/spark-data
     environment:
       - SPARK_LOCAL_IP=spark-master
       - SPARK_WORKLOAD=master
-
-  spark-console:
-    build:
-      context: .
-    volumes:
-      - ./dist:/opt/spark-apps
-      - ./data:/opt/spark-data
-    depends_on:
-      - spark-master
-    environment:
-      - SPARK_WORKLOAD=submit
+      - SPARK_CONF_DIR=/conf
     
   spark-worker:
     build:
       context: .
+      dockerfile: ./docker/Dockerfile.delta-spark_scala2.13
     deploy:
       replicas: 3
     ports:
@@ -43,6 +37,28 @@ services:
       - SPARK_EXECUTOR_MEMORY=1G
       - SPARK_WORKLOAD=worker
       - SPARK_LOCAL_IP=spark-worker
+      - SPARK_CONF_DIR=/conf
+    volumes:
+      - ./conf/worker:/conf
+      - ./dist:/opt/spark-apps
+      - ./dist:/opt/spark/work
+      - ./data:/opt/spark-data
+
+  spark-console:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.delta-spark_scala2.13
     volumes:
       - ./dist:/opt/spark-apps
       - ./data:/opt/spark-data
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_WORKLOAD=submit
+
+  scala-jupyter:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.jupyter
+    ports:
+      - "8888:8888"

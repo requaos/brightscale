@@ -32,21 +32,24 @@ WORKDIR /opt/spark
 
 ENV SPARK_MASTER_PORT=7077 \
 SPARK_MASTER_WEBUI_PORT=8080 \
-SPARK_LOG_DIR=/opt/spark-apps/logs \
-SPARK_MASTER_LOG=/opt/spark-apps/logs/spark-master.out \
-SPARK_WORKER_LOG=/opt/spark-apps/logs/spark-worker.out \
+SPARK_LOG_DIR=/opt/spark-apps \
+SPARK_MASTER_LOG=/opt/spark-apps/spark-master.out \
+SPARK_WORKER_LOG=/opt/spark-apps/spark-worker.out \
+SPARK_EVENT_DIR=/tmp/spark-events \
 SPARK_WORKER_WEBUI_PORT=8080 \
 SPARK_WORKER_PORT=7000 \
 SPARK_MASTER="spark://spark-master:7077" \
 SPARK_WORKLOAD="master"
 
-EXPOSE 8080 7077 6066
+EXPOSE 8080 7077 6066 4040 7006 7005 7004 7003 7002 7001
 
 RUN mkdir -p $SPARK_LOG_DIR && \
+mkdir -p $SPARK_EVENT_DIR && \
 touch $SPARK_MASTER_LOG && \
 touch $SPARK_WORKER_LOG && \
 ln -sf /dev/stdout $SPARK_MASTER_LOG && \
-ln -sf /dev/stdout $SPARK_WORKER_LOG
+ln -sf /dev/stdout $SPARK_WORKER_LOG && \
+ln -sf /dev/stdout $SPARK_HISTORY_LOG
 
 COPY bootstrap.sh /
 
