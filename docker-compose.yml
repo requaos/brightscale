@@ -62,3 +62,5 @@ services:
       dockerfile: ./docker/Dockerfile.jupyter
     ports:
       - "8888:8888"
+    volumes:
+      - ./data:/opt/spark-data
