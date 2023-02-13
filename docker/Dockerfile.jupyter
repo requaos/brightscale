@@ -29,6 +29,8 @@ RUN wget --no-verbose -O apache-spark.tgz "https://archive.apache.org/dist/spark
 RUN wget https://repo1.maven.org/maven2/io/delta/delta-core_$SCALA_VERSION/$DELTA_VERSION/delta-core_$SCALA_VERSION-$DELTA_VERSION.jar -P $SPARK_HOME/jars/ && \
     wget https://repo1.maven.org/maven2/io/delta/delta-storage/$DELTA_VERSION/delta-storage-$DELTA_VERSION.jar -P $SPARK_HOME/jars/
 
+
+
 # Install Toree kernel for Scala2.13 support on spark 3.x
 RUN pip install https://dist.apache.org/repos/dist/dev/incubator/toree/0.5.0-incubating-rc5/toree-pip/toree-0.5.0.tar.gz && \
     jupyter toree install --spark_home=${SPARK_HOME} && \
