@@ -43,15 +43,12 @@ object Streaming {
 
         import spark.implicits._
 
-        val exampleDir = new File("/opt/spark-data/delta-streaming/")
-        if (exampleDir.exists()) FileUtils.deleteDirectory(exampleDir)
-
         println(
           "=== Section 1: write and read delta table using batch queries, and initialize table for later sections"
         )
         // Create a table
         val data = spark.range(0, 5)
-        val path = new File("/opt/spark-data/delta-streaming/delta-table").getAbsolutePath
+        val path = "s3a://delta-streaming/delta-table"
         data.write.format("delta").save(path)
 
         // Read table
@@ -61,11 +58,9 @@ object Streaming {
         println("=== Section 2: write and read delta using structured streaming")
         val streamingDf = spark.readStream.format("rate").load()
         val tablePath2 = new File(
-          "/opt/spark-data/delta-streaming/delta-table2"
+          "s3a://delta-streaming/delta-table2"
         ).getCanonicalPath
-        val checkpointPath = new File(
-          "/opt/spark-data/delta-streaming/checkpoint"
-        ).getCanonicalPath
+        val checkpointPath = "s3a://delta-streaming/checkpoint"
         val stream = streamingDf
           .select($"value" as "id")
           .writeStream
@@ -131,8 +126,8 @@ object Streaming {
         println(
           "############ Streaming appends with concurrent table repartition  ##########"
         )
-        val tbl1 = "/opt/spark-data/delta-streaming/delta-table4"
-        val tbl2 = "/opt/spark-data/delta-streaming/delta-table5"
+        val tbl1 = "s3a://delta-streaming/delta-table4"
+        val tbl2 = "s3a://delta-streaming/delta-table5"
         val numRows = 10
         spark.range(numRows).write.mode("overwrite").format("delta").save(tbl1)
         spark.read.format("delta").load(tbl1).show()
@@ -152,7 +147,7 @@ object Streaming {
           .format("delta")
           .option(
             "checkpointLocation",
-            new File("/opt/spark-data/delta-streaming/checkpoint/tbl1").getCanonicalPath
+            "s3a://delta-streaming/checkpoint/tbl1"
           )
           .outputMode("append")
           .start(tbl1)
@@ -174,9 +169,6 @@ object Streaming {
         println("######### After streaming write #########")
         spark.read.format("delta").load(tbl1).show()
 
-        println("=== In the end, clean all paths")
-        // Cleanup
-        if (exampleDir.exists()) FileUtils.deleteDirectory(exampleDir)
         spark.stop()
     }
 }

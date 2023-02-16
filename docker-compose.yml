@@ -12,7 +12,6 @@ services:
       - ./conf/master:/conf
       - ./dist:/opt/spark-apps
       - ./dist:/opt/spark/work
-      - ./data:/opt/spark-data
     environment:
       - SPARK_LOCAL_IP=spark-master
       - SPARK_WORKLOAD=master
@@ -42,7 +41,6 @@ services:
       - ./conf/worker:/conf
       - ./dist:/opt/spark-apps
       - ./dist:/opt/spark/work
-      - ./data:/opt/spark-data
 
   spark-console:
     build:
@@ -50,7 +48,7 @@ services:
       dockerfile: ./docker/Dockerfile.delta-spark_scala2.13
     volumes:
       - ./dist:/opt/spark-apps
-      - ./data:/opt/spark-data
+      - ./data/delta-streaming:/data/delta-streaming
     depends_on:
       - spark-master
     environment:
@@ -60,7 +58,18 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile.jupyter
+    volumes:
+      - ./data/notebook-bucket:/data/notebook-bucket
     ports:
       - "8888:8888"
+
+  s3-like:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.minio
+    command: ["minio", "server", "/data", "--console-address", ":9001"]
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     volumes:
-      - ./data:/opt/spark-data
+      - ./data:/data/

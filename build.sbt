@@ -6,6 +6,7 @@ organizationName := "requiredprofessionals"
 scalaVersion := "2.13.10"
 val sparkVersion = "3.3.1"
 val deltaVersion = "2.2.0"
+val hadoopVersion = "3.3.4"
 
 lazy val extraMavenRepo = sys.env.get("EXTRA_MAVEN_REPO").toSeq.map { repo =>
   resolvers += "Delta" at repo

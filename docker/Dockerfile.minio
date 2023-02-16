@@ -1,0 +1,7 @@
+FROM minio/minio
+
+ENV MINIO_ROOT_USER=secretaccesskey \
+    MINIO_ROOT_PASSWORD=secretsecretkey
+
+RUN mkdir -p /data/delta-streaming && \
+    mkdir -p /data/notebook-bucket
