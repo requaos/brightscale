@@ -17,4 +17,4 @@
 
 # This file is populated when making the pip package. It should be empty by default.
 __version__ = '0.6.0.dev0'
-__commit__ = '43fe854e7f49'
+__commit__ = '08bc56e7989e'

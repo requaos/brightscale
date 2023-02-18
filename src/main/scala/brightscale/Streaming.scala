@@ -57,9 +57,7 @@ object Streaming {
 
         println("=== Section 2: write and read delta using structured streaming")
         val streamingDf = spark.readStream.format("rate").load()
-        val tablePath2 = new File(
-          "s3a://delta-streaming/delta-table2"
-        ).getCanonicalPath
+        val tablePath2 = "s3a://delta-streaming/delta-table2"
         val checkpointPath = "s3a://delta-streaming/checkpoint"
         val stream = streamingDf
           .select($"value" as "id")
